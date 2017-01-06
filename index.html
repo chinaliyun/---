@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>三级联动</title>
+</head>
+<body>
+	<form action="">
+		<select name="first" id="" class="first">
+		</select>
+		<select name="second" id="" class="second">
+		</select>
+		<select name="third" id="" class="third">
+		</select>
+	</form>
+	<script src="jquery-1.11.0.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			var jsonData,secondList,thirdList;
+			var optionEle =$('<option></option>').get(0);
+			$.ajax({
+				url: "getjson.php",
+				type: "GET",
+				async: 'true',
+				success: function(data){
+					// var json = eacape(data)
+					// console.log(data)
+					jsonData = JSON.parse(data);
+					// console.log(jsonData)
+					// jsonData = data;
+					// 插入第一个input
+					for(i in jsonData){
+						// console.log(jsonData[i])
+						var ele = optionEle.cloneNode(true);
+						ele.innerHTML = jsonData[i].name;
+						ele.value = jsonData[i]['_id'];
+						// console.log(ele)
+						$('.first').append(ele);
+					}
+					// console.log(jsonData)
+					getSecondValue();
+					
+
+				},
+				error: function (err){
+					console.error(err)
+				}
+			})
+			$('.first').change(function(){
+				getSecondValue();
+			})
+			$('.second').change(function(){
+				getThirdValue();
+			})
+			function getSecondValue(){
+				// 获取二级列表
+				var firstValue = $('.first').val();
+				// console.log(firstValue)
+				for(i in jsonData){
+					// console.log(jsonData[i]);
+					if(jsonData[i]['_id'] == firstValue){
+						// console.log(jsonData[i])
+						secondList = jsonData[i].list;
+						// console.log(secondList)
+						$('.second').empty();
+						for(j in secondList){
+							var ele = optionEle.cloneNode(true);
+							ele.innerHTML = secondList[j].name;
+							ele.value = secondList[j]['_id'];
+							// console.log(ele)
+							$('.second').append(ele);
+							// thirdList = secondList[i].list;
+						}
+						getThirdValue();
+						break;
+					}
+				}
+			}
+			function getThirdValue(){
+				var firstValue = $('.first').val();
+				var secondValue = $('.second').val();
+				// console.log(firstValue);
+				// console.log(secondValue);
+				for(i in jsonData){
+					if(jsonData[i]['_id'] == firstValue){
+						secondList = jsonData[i].list;
+						// console.log(secondList)
+						for(j in secondList){
+							if(secondList[j]['_id'] == secondValue){
+								// console.log(secondList[j]['_id'] )
+								thirdList = secondList[j].list;
+								$('.third').empty();
+								for(k in thirdList){
+									var ele = optionEle.cloneNode(true);
+									ele.innerHTML = thirdList[k].name;
+									ele.value = thirdList[k]['_id'];
+									// console.log(ele)
+									$('.third').append(ele);
+								}
+								break;
+							}
+						}
+					}
+				}
+			}
+		})
+		
+	</script>
+</body>
+</html>
